@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+plugins {
+     id 'org.jmailen.kotlinter' version "3.10.0" apply false
+}
+
 allprojects {
     repositories {
         mavenCentral()
