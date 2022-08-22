@@ -2,6 +2,7 @@ package org.claudemirovsky.noveltomanga
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -69,10 +70,15 @@ class NovelToManga {
             drawColor(theme.backgroundColor)
         }
 
-        val staticLayout: StaticLayout = StaticLayout.Builder
-            .obtain(page, 0, page.length, TEXTPAINT, LIMIT_WIDTH)
-            .setAlignment(alignment)
-            .build()
+        val staticLayout: StaticLayout =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                StaticLayout.Builder
+                    .obtain(page, 0, page.length, TEXTPAINT, LIMIT_WIDTH)
+                    .setAlignment(alignment)
+                    .build()
+            } else {
+                StaticLayout(page, TEXTPAINT, LIMIT_WIDTH, alignment, 1F, 0F, false)
+            }
 
         canvas.save()
         canvas.translate(margin, margin)
