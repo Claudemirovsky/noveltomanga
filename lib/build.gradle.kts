@@ -1,7 +1,7 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("org.jmailen.kotlinter")
+    alias(libs.plugins.android.library) 
+    alias(libs.plugins.kotlinter) 
+    alias(libs.plugins.kotlin.android) 
 }
 
 android {
@@ -20,8 +20,7 @@ android {
 }
 
 dependencies {
-    //compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
-    implementation("com.github.davidmoten:word-wrap:0.1.9")
+    implementation(libs.wordwrap)
 }
 
 tasks.preBuild { dependsOn(tasks.lintKotlin) }
