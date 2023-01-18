@@ -23,5 +23,12 @@ dependencies {
     implementation(libs.wordwrap)
 }
 
-tasks.preBuild { dependsOn(tasks.lintKotlin) }
-tasks.lintKotlin { dependsOn(tasks.formatKotlin) }
+tasks {
+    preBuild {
+        dependsOn(lintKotlin)
+    }
+
+    lintKotlin { 
+        dependsOn(formatKotlin) 
+    }
+}

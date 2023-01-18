@@ -1,7 +1,7 @@
 [libraries]
-wordwrap = "com.github.davidmoten:word-wrap:0.1.9"
+wordwrap = "com.github.davidmoten:word-wrap:0.1.11"
 
 [plugins]
-android-library = { id = "com.android.library", version = "7.2.1" }
-kotlinter = { id = "org.jmailen.kotlinter", version = "3.10.0" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.6.21" }
+android-library = { id = "com.android.library", version = "7.4.0" }
+kotlinter = { id = "org.jmailen.kotlinter", version = "3.13.0" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.8.0" }
