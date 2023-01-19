@@ -20,6 +20,9 @@ interface Theme {
     val fontColor: Int
 }
 
+// We use this instead of android.graphics.Color.rgb()
+// because extensions-inspector would explode in flames due to
+// its implementation being just a stub.
 fun Theme.rgbaColor(R: Int, G: Int, B: Int, A: Int = 255): Int {
-    return (A and 0xff) shl 24 or (R and 0xff) shl 16 or (G and 0xff) shl 8 or (B and 0xff)
+    return (A shl 24) or (R shl 16) or (G shl 8) or B
 }
