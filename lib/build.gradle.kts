@@ -20,6 +20,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.coroutines)
     implementation(libs.wordwrap)
 }
 

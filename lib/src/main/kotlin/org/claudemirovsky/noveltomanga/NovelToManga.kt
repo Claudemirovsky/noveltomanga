@@ -6,6 +6,10 @@ import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import org.davidmoten.text.utils.WordWrap
 
 class NovelToManga {
@@ -49,8 +53,7 @@ class NovelToManga {
     }
 
     private fun getTextPages(lines: List<String>): List<String> {
-        val totalLines = mutableListOf<String>()
-        lines.forEach { totalLines.addAll(wrapText(it)) }
+        val totalLines = lines.parallelMap(::wrapText).flatten()
         val maxLines = (DEFAULT_HEIGHT / LINE_HEIGHT).toInt()
         val pageChunks = totalLines.chunked(maxLines)
         return pageChunks.map { it.joinToString("\n") }
@@ -61,7 +64,7 @@ class NovelToManga {
     fun getMangaPages(lines: List<String>): List<Bitmap> {
         setTextPaint()
         val pages = getTextPages(lines)
-        return pages.map(::drawPage)
+        return pages.parallelMap(::drawPage)
     }
 
     private fun drawPage(page: String): Bitmap {
@@ -87,4 +90,9 @@ class NovelToManga {
 
         return bitmap
     }
+
+    private fun <A, B> Iterable<A>.parallelMap(f: suspend (A) -> B): List<B> =
+        runBlocking {
+            map { async(Dispatchers.Default) { f(it) } }.awaitAll()
+        }
 }
