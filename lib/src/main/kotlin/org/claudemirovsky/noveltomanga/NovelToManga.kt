@@ -13,6 +13,11 @@ import kotlinx.coroutines.runBlocking
 import org.davidmoten.text.utils.WordWrap
 
 class NovelToManga {
+    companion object {
+        private const val DEFAULT_WIDTH = 1080
+        private const val DEFAULT_HEIGHT = 1536
+    }
+
     private lateinit var TEXTPAINT: TextPaint
     var theme: Theme = DefaultThemes.DARK
     var separateLines: Boolean = true
@@ -20,16 +25,16 @@ class NovelToManga {
     var margin: Float = 25F
     var alignment = Layout.Alignment.ALIGN_NORMAL
 
-    private val DEFAULT_WIDTH = 1080
+    private var LINE_HEIGHT: Float = fontSize
     private val LIMIT_WIDTH: Int
         get() = DEFAULT_WIDTH - (margin * 2).toInt()
-    private val DEFAULT_HEIGHT = 1536
-    private var LINE_HEIGHT: Float = fontSize
+
     private val DEFAULT_BITMAP = Bitmap.createBitmap(
         DEFAULT_WIDTH,
         DEFAULT_HEIGHT,
         Bitmap.Config.ARGB_8888
     )
+
 
     private fun setTextPaint() {
         TEXTPAINT = TextPaint().apply {
@@ -80,6 +85,7 @@ class NovelToManga {
                     .setAlignment(alignment)
                     .build()
             } else {
+                @Suppress("DEPRECATION")
                 StaticLayout(page, TEXTPAINT, LIMIT_WIDTH, alignment, 1F, 0F, false)
             }
 
