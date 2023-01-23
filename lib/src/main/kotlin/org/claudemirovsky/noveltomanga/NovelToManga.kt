@@ -30,12 +30,6 @@ class NovelToManga {
     private val LIMIT_WIDTH: Int
         get() = DEFAULT_WIDTH - (margin * 2).toInt()
 
-    private val DEFAULT_BITMAP = Bitmap.createBitmap(
-        DEFAULT_WIDTH,
-        DEFAULT_HEIGHT,
-        Bitmap.Config.ARGB_8888
-    )
-
     private fun setTextPaint() {
         TEXTPAINT = TextPaint().apply {
             isAntiAlias = true
@@ -79,12 +73,15 @@ class NovelToManga {
     }
 
     private fun drawPage(page: CharSequence): Bitmap {
-        val bitmap = DEFAULT_BITMAP.copy(DEFAULT_BITMAP.getConfig(), true)
+        val staticLayout = createLayoutFromText(page)
+        val bitmap = Bitmap.createBitmap(
+            DEFAULT_WIDTH,
+            staticLayout.height + (margin * 2).toInt(),
+            Bitmap.Config.ARGB_8888
+        )
         val canvas = Canvas(bitmap).apply {
             drawColor(theme.backgroundColor)
         }
-
-        val staticLayout = createLayoutFromText(page)
 
         canvas.save()
         canvas.translate(margin, margin)
