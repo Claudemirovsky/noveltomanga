@@ -45,9 +45,12 @@ class NovelToManga {
     private val LIMIT_WIDTH: Int
         get() = DEFAULT_WIDTH - (margin * 2).toInt()
 
+    fun getTextPages(lines: List<String>) = getTextPages(lines.joinToString("\n"))
+
     // https://github.com/onikx/PagedTextView/blob/master/lib/src/main/java/com/onik/pagedtextview/PagedTextView.kt#L128
-    private fun getTextPages(page: CharSequence): List<CharSequence> {
-        val layout = createLayoutFromText(page)
+    fun getTextPages(text: String): List<CharSequence> {
+        val spaced = if (separateLines) text.replace("\n", "\n\n") else text
+        val layout = createLayoutFromText(spaced)
         val lines = layout.lineCount
         var startOffset = 0
         var height = LIMIT_HEIGHT
@@ -70,15 +73,10 @@ class NovelToManga {
         return pageList
     }
 
-    fun getMangaPages(lines: List<String>) = getMangaPages(lines.joinToString("\n"))
+    fun getMangaPages(lines: List<String>) = getTextPages(lines).parallelMap(::drawPage)
+    fun getMangaPages(text: String) = getTextPages(text).parallelMap(::drawPage)
 
-    fun getMangaPages(text: String): List<Bitmap> {
-        val spaced = if (separateLines) text.replace("\n", "\n\n") else text
-        val pages = getTextPages(spaced)
-        return pages.parallelMap(::drawPage)
-    }
-
-    private fun drawPage(page: CharSequence): Bitmap {
+    fun drawPage(page: CharSequence): Bitmap {
         val staticLayout = createLayoutFromText(page)
         val bitmap = Bitmap.createBitmap(
             DEFAULT_WIDTH,
