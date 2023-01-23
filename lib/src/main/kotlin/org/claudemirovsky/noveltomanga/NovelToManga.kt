@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import org.davidmoten.text.utils.WordWrap
 
 class NovelToManga {
     companion object {
@@ -25,7 +24,9 @@ class NovelToManga {
     var margin: Float = 25F
     var alignment = Layout.Alignment.ALIGN_NORMAL
 
-    private var LINE_HEIGHT: Float = fontSize
+    private val LIMIT_HEIGHT: Int
+        get() = DEFAULT_HEIGHT - (margin * 2).toInt()
+
     private val LIMIT_WIDTH: Int
         get() = DEFAULT_WIDTH - (margin * 2).toInt()
 
@@ -35,59 +36,55 @@ class NovelToManga {
         Bitmap.Config.ARGB_8888
     )
 
-
     private fun setTextPaint() {
         TEXTPAINT = TextPaint().apply {
             isAntiAlias = true
             color = theme.fontColor
             textSize = fontSize
         }
-        val fm = TEXTPAINT.getFontMetrics()
-        LINE_HEIGHT = fm.bottom - fm.top + fm.leading
     }
 
-    private fun wrapText(text: String): List<String> {
-        val wrapped = WordWrap.from(text)
-            .maxWidth(LIMIT_WIDTH)
-            .stringWidth({ c: CharSequence -> TEXTPAINT.measureText(c.toString()) })
-            .wrapToList()
-        return when (separateLines) {
-            true -> wrapped + listOf("")
-            else -> wrapped
+    // https://github.com/onikx/PagedTextView/blob/master/lib/src/main/java/com/onik/pagedtextview/PagedTextView.kt#L128
+    private fun getTextPages(page: CharSequence): List<CharSequence> {
+        val layout = createLayoutFromText(page)
+        val lines = layout.lineCount
+        var startOffset = 0
+        var height = LIMIT_HEIGHT
+        val pageList = mutableListOf<CharSequence>()
+        for (i in 0 until lines) {
+            if (height < layout.getLineBottom(i)) {
+                pageList.add(
+                    layout.text.subSequence(startOffset, layout.getLineStart(i))
+                )
+                startOffset = layout.getLineStart(i)
+                height = layout.getLineTop(i) + LIMIT_HEIGHT
+            }
+
+            if (i == lines - 1) {
+                pageList.add(
+                    layout.text.subSequence(startOffset, layout.getLineEnd(i))
+                )
+            }
         }
+        return pageList
     }
 
-    private fun getTextPages(lines: List<String>): List<String> {
-        val totalLines = lines.parallelMap(::wrapText).flatten()
-        val maxLines = (DEFAULT_HEIGHT / LINE_HEIGHT).toInt()
-        val pageChunks = totalLines.chunked(maxLines)
-        return pageChunks.map { it.joinToString("\n") }
-    }
+    fun getMangaPages(lines: List<String>) = getMangaPages(lines.joinToString("\n"))
 
-    fun getMangaPages(text: String) = getMangaPages(text.split("\n"))
-
-    fun getMangaPages(lines: List<String>): List<Bitmap> {
+    fun getMangaPages(text: String): List<Bitmap> {
         setTextPaint()
-        val pages = getTextPages(lines)
+        val spaced = if (separateLines) text.replace("\n", "\n\n") else text
+        val pages = getTextPages(spaced)
         return pages.parallelMap(::drawPage)
     }
 
-    private fun drawPage(page: String): Bitmap {
+    private fun drawPage(page: CharSequence): Bitmap {
         val bitmap = DEFAULT_BITMAP.copy(DEFAULT_BITMAP.getConfig(), true)
         val canvas = Canvas(bitmap).apply {
             drawColor(theme.backgroundColor)
         }
 
-        val staticLayout: StaticLayout =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                StaticLayout.Builder
-                    .obtain(page, 0, page.length, TEXTPAINT, LIMIT_WIDTH)
-                    .setAlignment(alignment)
-                    .build()
-            } else {
-                @Suppress("DEPRECATION")
-                StaticLayout(page, TEXTPAINT, LIMIT_WIDTH, alignment, 1F, 0F, false)
-            }
+        val staticLayout = createLayoutFromText(page)
 
         canvas.save()
         canvas.translate(margin, margin)
@@ -97,6 +94,17 @@ class NovelToManga {
         return bitmap
     }
 
+    private fun createLayoutFromText(text: CharSequence): StaticLayout {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            StaticLayout.Builder
+                .obtain(text, 0, text.length, TEXTPAINT, LIMIT_WIDTH)
+                .setAlignment(alignment)
+                .build()
+        } else {
+            @Suppress("DEPRECATION")
+            StaticLayout(text, TEXTPAINT, LIMIT_WIDTH, alignment, 1F, 0F, false)
+        }
+    }
     private fun <A, B> Iterable<A>.parallelMap(f: suspend (A) -> B): List<B> =
         runBlocking {
             map { async(Dispatchers.Default) { f(it) } }.awaitAll()

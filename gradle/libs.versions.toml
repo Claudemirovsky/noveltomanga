@@ -1,6 +1,5 @@
 [libraries]
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.6.4" }
-wordwrap = "com.github.davidmoten:word-wrap:0.1.11"
 
 [plugins]
 android-library = { id = "com.android.library", version = "7.4.0" }
