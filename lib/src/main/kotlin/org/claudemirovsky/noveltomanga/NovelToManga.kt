@@ -17,26 +17,33 @@ class NovelToManga {
         private const val DEFAULT_HEIGHT = 1536
     }
 
-    private lateinit var TEXTPAINT: TextPaint
-    var theme: Theme = DefaultThemes.DARK
+    private val textpaint by lazy {
+        TextPaint().apply {
+            isAntiAlias = true
+            color = theme.fontColor
+            textSize = fontSize
+        }
+    }
+
+    var alignment = Layout.Alignment.ALIGN_NORMAL
+    var margin: Float = 25F
     var separateLines: Boolean = true
     var fontSize: Float = 25F
-    var margin: Float = 25F
-    var alignment = Layout.Alignment.ALIGN_NORMAL
+        set(value) {
+            textpaint.textSize = value
+            field = value
+        }
+    var theme: Theme = DefaultThemes.DARK
+        set(value) {
+            textpaint.color = value.fontColor
+            field = value
+        }
 
     private val LIMIT_HEIGHT: Int
         get() = DEFAULT_HEIGHT - (margin * 2).toInt()
 
     private val LIMIT_WIDTH: Int
         get() = DEFAULT_WIDTH - (margin * 2).toInt()
-
-    private fun setTextPaint() {
-        TEXTPAINT = TextPaint().apply {
-            isAntiAlias = true
-            color = theme.fontColor
-            textSize = fontSize
-        }
-    }
 
     // https://github.com/onikx/PagedTextView/blob/master/lib/src/main/java/com/onik/pagedtextview/PagedTextView.kt#L128
     private fun getTextPages(page: CharSequence): List<CharSequence> {
@@ -66,7 +73,6 @@ class NovelToManga {
     fun getMangaPages(lines: List<String>) = getMangaPages(lines.joinToString("\n"))
 
     fun getMangaPages(text: String): List<Bitmap> {
-        setTextPaint()
         val spaced = if (separateLines) text.replace("\n", "\n\n") else text
         val pages = getTextPages(spaced)
         return pages.parallelMap(::drawPage)
@@ -94,12 +100,12 @@ class NovelToManga {
     private fun createLayoutFromText(text: CharSequence): StaticLayout {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             StaticLayout.Builder
-                .obtain(text, 0, text.length, TEXTPAINT, LIMIT_WIDTH)
+                .obtain(text, 0, text.length, textpaint, LIMIT_WIDTH)
                 .setAlignment(alignment)
                 .build()
         } else {
             @Suppress("DEPRECATION")
-            StaticLayout(text, TEXTPAINT, LIMIT_WIDTH, alignment, 1F, 0F, false)
+            StaticLayout(text, textpaint, LIMIT_WIDTH, alignment, 1F, 0F, false)
         }
     }
     private fun <A, B> Iterable<A>.parallelMap(f: suspend (A) -> B): List<B> =
