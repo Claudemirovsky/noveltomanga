@@ -12,11 +12,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 
 class NovelToManga {
-    companion object {
-        private const val DEFAULT_WIDTH = 1080
-        private const val DEFAULT_HEIGHT = 1536
-    }
-
     private val textpaint by lazy {
         TextPaint().apply {
             isAntiAlias = true
@@ -27,6 +22,8 @@ class NovelToManga {
 
     var alignment = Layout.Alignment.ALIGN_NORMAL
     var margin: Float = 25F
+    var pageHeight = 1536
+    var pageWidth = 1080
     var separateLines: Boolean = true
     var fontSize: Float = 25F
         set(value) {
@@ -40,10 +37,10 @@ class NovelToManga {
         }
 
     private val LIMIT_HEIGHT: Int
-        get() = DEFAULT_HEIGHT - (margin * 2).toInt()
+        get() = pageHeight - (margin * 2).toInt()
 
     private val LIMIT_WIDTH: Int
-        get() = DEFAULT_WIDTH - (margin * 2).toInt()
+        get() = pageWidth - (margin * 2).toInt()
 
     fun getTextPages(lines: List<String>) = getTextPages(lines.joinToString("\n"))
 
@@ -79,7 +76,7 @@ class NovelToManga {
     fun drawPage(page: CharSequence): Bitmap {
         val staticLayout = createLayoutFromText(page)
         val bitmap = Bitmap.createBitmap(
-            DEFAULT_WIDTH,
+            pageWidth,
             staticLayout.height + (margin * 2).toInt(),
             Bitmap.Config.ARGB_8888
         )
