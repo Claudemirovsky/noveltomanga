@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.library) 
     alias(libs.plugins.kotlinter) 
-    alias(libs.plugins.kotlin.android) 
+    alias(libs.plugins.kotlin.android)
+    `maven-publish`
 }
 
 android {
@@ -30,5 +31,19 @@ tasks {
 
     lintKotlin { 
         dependsOn(formatKotlin) 
+    }
+}
+
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.Claudemirovsky"
+            artifactId = "noveltomanga"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
     }
 }
