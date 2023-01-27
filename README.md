@@ -10,7 +10,7 @@ Kotlin library to convert text to manga pages, with the intention of adding supp
 Add this line to your `build.gradle`:
 ```groovy
 dependencies {
-    implementation 'com.github.Claudemirovsky:noveltomanga:1.1'
+    implementation 'com.github.Claudemirovsky:noveltomanga:1.2'
 }
 ```
 read about [jitpack](https://jitpack.io) before adding this dependency.
@@ -37,6 +37,8 @@ val ntm = NovelToManga().apply {
     fontSize = 35F
     margin = 75F
     theme = DefaultThemes.LIGHT
+    // pageHeight = 1536
+    // pageWidth = 1080
     alignment = Layout.Alignment.ALIGN_CENTER
     separateLines = true
 }
@@ -50,7 +52,7 @@ output:
 I recommend making your tachiyomi-extension class extends `ConfigurableSource`, so you can add preferences to change the appearence of pages.
 
 ## TODO
-- [ ] Speedup bitmap creation
-- [ ] Make page creation on-demand, without waiting for all pages to be created
+- [x] Speedup bitmap creation
+- [x] Make page creation on-demand, without waiting for all pages to be created
 - [ ] Better documentation. Currently its almost non-existant xD
 - [ ] Add multiple fonts support
