@@ -1,13 +1,32 @@
 name: Release
 on: 
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Version/tag'     
-        required: true
+  push:
+    tags:
+      - 'v*'
 jobs:
+  changelog:
+    name: Generate changelog
+    runs-on: ubuntu-latest
+    outputs:
+      release_body: ${{ steps.git-cliff.outputs.content }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Generate a changelog
+        uses: orhun/git-cliff-action@v2
+        id: git-cliff
+        with:
+          config: .github/workflows/cliff.toml
+          args: -vv --latest 
+        env:
+          OUTPUT: CHANGELOG.md
+
   build:
-    name: Build library
+    name: Build and publish library
+    needs: changelog
     runs-on: ubuntu-latest
 
     steps:
@@ -28,25 +47,14 @@ jobs:
         with:
           arguments: assembleRelease
 
-      - name: Prepare to release
-        run: |
-          set -e
-          mv lib/build/outputs/aar/lib-release.aar noveltomanga-${{ github.event.inputs.tag }}.aar
-          sha=`sha256sum noveltomanga-${{ github.event.inputs.tag }}.aar | awk '{ print $1 }'`
-          echo "RELEASE_HASH=$sha" >> $GITHUB_ENV
+      - run: mv lib/build/outputs/aar/lib-release.aar noveltomanga-${{ github.ref_name }}.aar
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.tag }}
-          name: NovelToManga ${{ github.event.inputs.tag }}
-          body: |
-            ---
-            ### Checksum
-            | Variant | SHA-256 |
-            | ------- | ------- |
-            | Release | ${{ env.RELEASE_HASH }}
-          files: noveltomanga-${{ github.event.inputs.tag }}.aar
+          name: NovelToManga ${{ github.ref_name }}
+          body: ${{ needs.changelog.outputs.release_body }}
+          files: noveltomanga-${{ github.ref_name }}.aar
           draft: false
           prerelease: false
         env:
