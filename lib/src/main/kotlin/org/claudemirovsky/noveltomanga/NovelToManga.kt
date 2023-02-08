@@ -27,12 +27,12 @@ class NovelToManga {
     var separateLines: Boolean = true
     var fontSize: Float = 25F
         set(value) {
-            textpaint.textSize = value
+            runCatching { textpaint.textSize = value }
             field = value
         }
     var theme: Theme = DefaultThemes.DARK
         set(value) {
-            textpaint.color = value.fontColor
+            runCatching { textpaint.color = value.fontColor }
             field = value
         }
 
