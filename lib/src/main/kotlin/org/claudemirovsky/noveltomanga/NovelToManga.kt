@@ -103,7 +103,8 @@ class NovelToManga {
             StaticLayout(text, textpaint, LIMIT_WIDTH, alignment, 1F, 0F, false)
         }
     }
-    private fun <A, B> Iterable<A>.parallelMap(f: suspend (A) -> B): List<B> =
+
+    private inline fun <A, B> Iterable<A>.parallelMap(crossinline f: suspend (A) -> B): List<B> =
         runBlocking {
             map { async(Dispatchers.Default) { f(it) } }.awaitAll()
         }
