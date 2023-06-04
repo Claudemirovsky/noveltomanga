@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(32)
+    compileSdk = 32
+    namespace = "org.claudemirovsky.noveltomanga"
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(32)
+        minSdk = 21
     }
 
     buildTypes {
@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.coroutines)
+    compileOnly(libs.coroutines)
 }
 
 tasks {
@@ -40,6 +40,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.Claudemirovsky"
             artifactId = "noveltomanga"
+            version = "1.2"
 
             afterEvaluate {
                 from(components["release"])

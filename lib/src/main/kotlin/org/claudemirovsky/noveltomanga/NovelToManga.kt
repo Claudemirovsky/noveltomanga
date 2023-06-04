@@ -55,7 +55,7 @@ class NovelToManga {
         for (i in 0 until lines) {
             if (height < layout.getLineBottom(i)) {
                 pageList.add(
-                    layout.text.subSequence(startOffset, layout.getLineStart(i))
+                    layout.text.subSequence(startOffset, layout.getLineStart(i)),
                 )
                 startOffset = layout.getLineStart(i)
                 height = layout.getLineTop(i) + LIMIT_HEIGHT
@@ -63,7 +63,7 @@ class NovelToManga {
 
             if (i == lines - 1) {
                 pageList.add(
-                    layout.text.subSequence(startOffset, layout.getLineEnd(i))
+                    layout.text.subSequence(startOffset, layout.getLineEnd(i)),
                 )
             }
         }
@@ -78,7 +78,7 @@ class NovelToManga {
         val bitmap = Bitmap.createBitmap(
             pageWidth,
             staticLayout.height + (margin * 2).toInt(),
-            Bitmap.Config.ARGB_8888
+            Bitmap.Config.ARGB_8888,
         )
         val canvas = Canvas(bitmap).apply {
             drawColor(theme.backgroundColor)

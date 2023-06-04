@@ -12,7 +12,7 @@ enum class DefaultThemes : Theme {
     LIGHT {
         override val backgroundColor = rgbaColor(244, 244, 244)
         override val fontColor = rgbaColor(34, 34, 34)
-    }
+    },
 }
 
 interface Theme {
