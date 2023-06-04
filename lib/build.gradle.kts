@@ -40,7 +40,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.github.Claudemirovsky"
             artifactId = "noveltomanga"
-            version = "1.2"
+            version = "1.2.1"
 
             afterEvaluate {
                 from(components["release"])

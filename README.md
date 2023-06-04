@@ -10,7 +10,7 @@ Kotlin library to convert text to manga pages, with the intention of adding supp
 Add this line to your `build.gradle`:
 ```groovy
 dependencies {
-    implementation 'com.github.Claudemirovsky:noveltomanga:1.2'
+    implementation 'com.github.Claudemirovsky:noveltomanga:1.2.1'
 }
 ```
 read about [jitpack](https://jitpack.io) before adding this dependency.
